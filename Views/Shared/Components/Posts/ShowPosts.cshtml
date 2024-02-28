@@ -1,0 +1,90 @@
+﻿@{
+    PostInfoModel Post = ViewData["Post"] as PostInfoModel;
+}
+
+<div class="card col-sm-11 mx-2 my-1">
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-12">
+                @await Component.InvokeAsync("UserActions", Post)
+            </div>
+            <div class="col-12">
+                <span class="text-muted" style="font-size: 13px">
+                    Posted: @Post.PostedDate
+                </span>
+
+                @(Post.PostEditedDate != null)
+                {
+                    <i class="bi bi-dot text-muted"></i>
+                    <span class="text-muted" style="font-size: 13px">
+                        Edited: @Post.PostEditedDate
+                    </span>
+                }
+            </div>
+        </div>
+
+
+        <div class="my-2 px-2 pt-2 pb-0 border-top">
+            <p>@Html.Raw(Post.PostContent)</p>
+        </div>
+
+        <div class="row text-center pb-0">
+
+            <div class="col-4">
+                <a asp-controller="post" asp-action="Replies" asp-route-PostId="@Post.PostId">
+                    <i class="bi bi-chat-left-text" id="reply-button" title="Replies"></i>
+                </a>
+                <span class="text-end" style="font-weight: normal; font-size: 13px;">@Post.Replies.Count()</span>
+            </div>
+
+            <div class="col-4">
+                @if(!User.Identity.IsAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" style="text-decoration: none;">
+                        <i class="bi bi-heart" title="Login to like this post"></i>
+                    </a>
+                    <span class="text-end" style="font-weight: normal; font-size: 13px;" id="like-display" >
+                        @Post.Likes.Count()
+                    </span>
+                }
+
+                else if(User.Identity.IsAuthenticated && User.Identity.Name != Post.UserName)
+                {
+                    if(Post.Likes.Contains(User.Identity.Name))
+                    {
+                        <i class="bi bi-heart-fill text-primary" title="Remove Link" id="like-button"></i>
+                        <span class="text-end" style="font-weight: normal; font-size:13px;" id="like-dispaly">@Post.Likes.Count()</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-heart text-primary" title="Like Post" id="like button"></i>
+                        <span class="text-end" style="font-weight: normal; font-size: 13px;" id="like-display">@Post.Likes.Count()></span>
+                    }
+                }
+
+                else if(User.Identity.Name == Post.UserName)
+                {
+                    <i class="bi bi-heart text-primary" title="you cannot like your own post" id="like button"></i>
+                    <span class="text-end" style="font-weight: normal; font-size: 13px;" id="like-display">@Post.Likes.Count()></span>
+                }
+            </div>
+
+            <div class="dropdown col-4">
+                <i class="bi bi-share text-primary" id="share-post" title="share the post" data-bs-toggle="dropdown" aria-expandable="false"></i>
+
+                <div class="dropdown-menu dropdown-menu-end" id="share-post-dropdown">
+                    <div class="input-group my-2 px-2">
+                        <input class="form-control" id="share-post-field" type="text" area-label="share-link" aria-describedby="share copy button" />
+                        <button class="btn btn-outline-primary" type="button" id="share-post-copy-button" title="copy to Clipboard"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    userNamesPost.push("@Post.UserName");
+</script>
